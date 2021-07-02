@@ -5,11 +5,16 @@ from utils.utils import drawing_nodes_params
 
 class automato:
     def __init__(self):
+        """
+
+        """
         self.graph = nx.DiGraph()
         self.states = []
+        self.C = []
         self.alphabet = []
         self.initial_state = None
         self.final_states = []
+        self.transition_table = {}
 
     def add_initial_state(self, state):
         self.initial_state = state
@@ -44,6 +49,21 @@ class automato:
                 self.graph.edges[original_state, destine_state]['transition symbol'].append(symbol)
             else:
                 self.graph.edges[original_state, destine_state].update({'transition symbol': [symbol]})
+
+            if original_state in self.transition_table.keys():
+                if symbol in self.transition_table[original_state].keys():
+                    self.transition_table[original_state][symbol].update({destine_state})
+                else:
+                    self.transition_table[original_state].update({
+                        symbol: {destine_state}
+                    })
+            else:
+                self.transition_table.update({
+                    original_state: {
+                        symbol: {destine_state}
+                    }
+                })
+
         else:
             print('this symbol is not in alphabet, add')
 
@@ -98,9 +118,30 @@ class automato:
 
 
 if __name__ == '__main__':
+    import json
+
     # some testing
     a = automato()
     a.add_state('q0')
     a.add_state('q1')
-    a.add_transition('q0', 'q1', '1')
-    print(a.graph.edges)
+    a.add_state('q2')
+
+    a.add_initial_state('q0')
+    a.final_state(['q2'])
+
+    a.add_alphabet(['a', 'b'])
+
+    a.add_transition('q0', 'q0', 'a')
+    a.add_transition('q0', 'q0', 'b')
+    a.add_transition('q0', 'q1', 'a')
+    a.add_transition('q0', 'q2', 'E')
+
+    a.add_transition('q1', 'q1', 'a')
+    a.add_transition('q1', 'q1', 'b')
+    a.add_transition('q1', 'q0', 'a')
+    a.add_transition('q1', 'q2', 'b')
+
+    a.add_transition('q2', 'q2', 'a')
+    a.add_transition('q2', 'q1', 'b')
+
+    print(str(a.transition_table))
