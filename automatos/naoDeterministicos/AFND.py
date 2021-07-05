@@ -17,10 +17,10 @@ class automato:
         self.transition_table = {}
 
     def add_initial_state(self, state):
-        self.initial_state = state
-        self.add_state(state)
-        self.graph.nodes[state].update({'initial state': True})
-        self.graph.nodes[state]['color'] = {'r': 247, 'g': 41, 'b': 41}
+        if state in self.states:
+            self.initial_state = state
+            self.graph.nodes[state].update({'initial state': True})
+            self.graph.nodes[state]['color'] = {'r': 247, 'g': 41, 'b': 41}
 
     def final_state(self, states):
         for state in states:
@@ -29,9 +29,24 @@ class automato:
                 self.graph.nodes[state].update({'final state': True})
                 self.graph.nodes[state]['color'] = {'r': 41, 'g': 247, 'b': 96}
 
+    def set_state_attributes(self, state, attribute_name, value):
+        """
+
+        :param state:
+        :param attribute_name:
+        :param value:
+        :return:
+        """
+        if attribute_name not in self.graph[state].keys():
+            self.graph.nodes[state].update({attribute_name: value})
+        else:
+            self.graph.nodes[state][attribute_name] = value
 
     def add_alphabet(self, alphabet):
-        self.alphabet = alphabet
+        if isinstance(alphabet, list):
+            self.alphabet = alphabet
+        elif isinstance(alphabet, str):
+            self.alphabet.append(alphabet)
 
     def is_state(self, state):
         return self.graph.has_node(state)
@@ -41,6 +56,10 @@ class automato:
             self.states.append(state)
             self.graph.add_node(state)
             self.graph.nodes[state].update({'color': {'r': 0, 'g': 0, 'b': 0}})
+
+    def add_all(self, states):
+        for state in states:
+            self.add_state(state)
 
     def add_transition(self, original_state, destine_state, symbol):
         self.graph.add_edge(original_state, destine_state)
@@ -98,16 +117,15 @@ class automato:
 
         for i in range(N):
             current_states = self.next_state(current_states, string[i])
-            print(current_states)
 
         token = False
         for state in current_states:
             if state in self.final_states:
                 token = True
-                print('string accepted')
+                return token
 
         if not token:
-            print('string not accepted')
+            return token
 
     def draw_automato(self):
         params = drawing_nodes_params(self.graph)

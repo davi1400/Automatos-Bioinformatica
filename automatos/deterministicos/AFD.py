@@ -38,7 +38,8 @@ class deterministic_automato:
         :param value:
         :return:
         """
-        self.graph[state].update({attribute_name: value})
+        print(self.graph.nodes)
+        self.graph.nodes[state].update({attribute_name: value})
 
     def add_state(self, state):
         if state not in self.states:
