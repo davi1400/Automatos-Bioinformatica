@@ -51,6 +51,10 @@ class automato:
     def is_state(self, state):
         return self.graph.has_node(state)
 
+    def add_all_states(self, states):
+        for state in states:
+            self.add_state(state)
+
     def add_state(self, state):
         if state not in self.states:
             self.states.append(state)

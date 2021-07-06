@@ -25,7 +25,11 @@ class deterministic_automato:
                 self.graph.nodes[state]['color'] = {'r': 41, 'g': 247, 'b': 96}
 
     def add_alphabet(self, alphabet):
-        self.alphabet = alphabet
+        if isinstance(alphabet, list):
+            self.alphabet = alphabet
+        elif isinstance(alphabet, (str, int, float)):
+            self.alphabet.append(alphabet)
+
 
     def is_state(self, state):
         return self.graph.has_node(state)
@@ -40,6 +44,10 @@ class deterministic_automato:
         """
         print(self.graph.nodes)
         self.graph.nodes[state].update({attribute_name: value})
+
+    def add_all_states(self, states):
+        for state in states:
+            self.add_state(state)
 
     def add_state(self, state):
         if state not in self.states:
@@ -58,7 +66,11 @@ class deterministic_automato:
 
         transitions = dict(self.graph[current_state])
         for state in transitions:
-            if transitions[state]['transition symbol'] == symbol:
+            if isinstance(transitions[state]['transition symbol'], list):
+                aux = transitions[state]['transition symbol'][0]
+            else:
+                aux = transitions[state]['transition symbol']
+            if aux == symbol:
                 current_state = state
 
         return current_state
@@ -75,9 +87,12 @@ class deterministic_automato:
             transitions = dict(self.graph[node])
             for state in transitions:
                 if transitions[state]['transition symbol'] not in transitions_symbols_for_state:
-                    transitions_symbols_for_state.append(transitions[state]['transition symbol'])
+                    if isinstance(transitions[state]['transition symbol'], list):
+                        transitions_symbols_for_state.append(transitions[state]['transition symbol'][0])
+                    else:
+                        transitions_symbols_for_state.append(transitions[state]['transition symbol'])
 
-            if transitions_symbols_for_state != self.alphabet:
+            if set(transitions_symbols_for_state) != set(self.alphabet):
                 is_deterministic = False
                 return is_deterministic
 
@@ -96,11 +111,11 @@ class deterministic_automato:
 
 
         if current_state in self.final_states:
-            print('string accepted')
-            return
+            # print('string accepted')
+            return True
         else:
-            print('string not accepted')
-            return
+            # print('string not accepted')
+            return False
 
     def draw_automato(self):
         params = drawing_nodes_params(self.graph)

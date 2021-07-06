@@ -1,3 +1,4 @@
+import collections
 from itertools import combinations
 from automatos.deterministicos.AFD import deterministic_automato
 
@@ -27,13 +28,26 @@ class conversor:
             if len(set(list(self.transtion_table_afd.keys())[i]).intersection(self.afnd.final_states)) > 0:
                 final_states.append(code + str(i))
 
-        self.afd.final_states(final_states)
+        self.afd.final_state(final_states)
 
     def create_transitions(self):
         pass
 
     def create_deterministic_automata(self):
         self.create_states()
+
+        for state in self.afd.states:
+            old_name_sate = self.afd.graph.nodes[state]['old_name_state']
+            transitions = self.transtion_table_afd[old_name_sate]
+            for symbol in transitions.keys():
+                next_state_set = transitions[symbol]
+
+                for node in self.afd.graph.nodes:
+                    next_state = self.afd.graph.nodes[node]['old_name_state']
+                    if collections.Counter(list(next_state))==collections.Counter(list(next_state_set)):
+                        if not self.afd.graph.has_edge(state, node) and not self.afd.graph.has_edge(node, state):
+                            self.afd.add_transition(state, node, symbol)
+
 
     def is_reacheble(self, state, reachebles):
         """
@@ -116,7 +130,7 @@ class conversor:
         self.delete_nodes()
 
         # Creating the states
-        self.create_deterministic_automata()
+        return self.create_deterministic_automata()
 
 
 if __name__ == '__main__':

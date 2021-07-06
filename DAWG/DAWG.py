@@ -1,5 +1,6 @@
 import networkx as nx
 from automatos.naoDeterministicos.AFND import automato
+from automatos.conversion.conversor import conversor
 
 __all__ = ['DAWG']
 
@@ -210,3 +211,8 @@ if __name__ == '__main__':
     print(result)
     print(expected_number_target)
     print(expected_number_non_target)
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    conv = conversor()
+    conv._to_deterministic(dawg_alg)
