@@ -151,68 +151,68 @@ if __name__ == '__main__':
         else:
             negative_words.append(words.iloc[i][0])
 
-    dawg = DAWG()
-    dawg.create(plus_words, negative_words)
+    dawg_alg = dawg()
+    dawg_alg.create(plus_words, negative_words)
 
     # ------------------------------------------------------------------------------------------------------------------
     # internal test
-    plus_words = sorted(plus_words)
-    print("internal test")
-    count = 0
-    for word in plus_words:
-        word += '+'
-        if dawg.in_automato_language(word):
-            count += 1
-
-    print("count positive")
-    print(count, len(plus_words))
-
-    # internal test
-    negative_words = sorted(negative_words)
-    print("internal test")
-
-    count = 0
-    for word in negative_words:
-        word += '+'
-        if dawg.in_automato_language(word):
-            count += 1
-
-    print("count negative")
-    print(count, len(negative_words))
-
-    # -----------------------------------------------------------------------------------------------------------------
-
-    # output test
-    path = get_project_root() + '/Automatos-Bioinformatica/datasets/' + 'waltzdb.csv'
-    df = pd.read_csv(path)
-    target = 'amyloid'
-    N, M = df.shape
-
-    expected_number_target = len(df[df['Classification'] == target])
-    expected_number_non_target = N - expected_number_target
-    result = {
-        'amyloid': 0,
-        'non-amyloid': 0
-    }
-    for i in range(N):
-        seguence = df.iloc[i]['Sequence']
-        c = df.iloc[i]['Classification']
-
-        seguence += '+'
-        token = dawg.in_automato_language(seguence)
-        if token:
-            if c == target:
-                result[target] += 1
-        elif not token:
-            if c != target:
-                result['non-amyloid'] += 1
-
-
-    print(result)
-    print(expected_number_target)
-    print(expected_number_non_target)
+    # plus_words = sorted(plus_words)
+    # print("internal test")
+    # count = 0
+    # for word in plus_words:
+    #     word += '+'
+    #     if dawg_alg.in_automato_language(word):
+    #         count += 1
+    #
+    # print("count positive")
+    # print(count, len(plus_words))
+    #
+    # # internal test
+    # negative_words = sorted(negative_words)
+    # print("internal test")
+    #
+    # count = 0
+    # for word in negative_words:
+    #     word += '+'
+    #     if dawg_alg.in_automato_language(word):
+    #         count += 1
+    #
+    # print("count negative")
+    # print(count, len(negative_words))
+    #
+    # # -----------------------------------------------------------------------------------------------------------------
+    #
+    # # output test
+    # path = get_project_root() + '/Automatos-Bioinformatica/datasets/' + 'waltzdb.csv'
+    # df = pd.read_csv(path)
+    # target = 'amyloid'
+    # N, M = df.shape
+    #
+    # expected_number_target = len(df[df['Classification'] == target])
+    # expected_number_non_target = N - expected_number_target
+    # result = {
+    #     'amyloid': 0,
+    #     'non-amyloid': 0
+    # }
+    # for i in range(N):
+    #     seguence = df.iloc[i]['Sequence']
+    #     c = df.iloc[i]['Classification']
+    #
+    #     seguence += '+'
+    #     token = dawg_alg.in_automato_language(seguence)
+    #     if token:
+    #         if c == target:
+    #             result[target] += 1
+    #     elif not token:
+    #         if c != target:
+    #             result['non-amyloid'] += 1
+    #
+    # print(result)
+    # print(expected_number_target)
+    # print(expected_number_non_target)
 
     # ------------------------------------------------------------------------------------------------------------------
 
     conv = conversor()
     conv._to_deterministic(dawg_alg)
+    dawg_alg_afd = conv.afd

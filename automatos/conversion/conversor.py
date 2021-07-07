@@ -44,10 +44,8 @@ class conversor:
 
                 for node in self.afd.graph.nodes:
                     next_state = self.afd.graph.nodes[node]['old_name_state']
-                    if collections.Counter(list(next_state))==collections.Counter(list(next_state_set)):
-                        if not self.afd.graph.has_edge(state, node) and not self.afd.graph.has_edge(node, state):
-                            self.afd.add_transition(state, node, symbol)
-
+                    if collections.Counter(list(next_state)) == collections.Counter(list(next_state_set)):
+                        self.afd.add_transition(state, node, symbol)
 
     def is_reacheble(self, state, reachebles):
         """
@@ -56,7 +54,7 @@ class conversor:
         :param reachebles:
         :return:
         """
-        if state in reachebles:
+        if set(state) in reachebles:
             return True
         else:
             return False
@@ -68,6 +66,10 @@ class conversor:
         :return:
         """
         loop = True
+        if self.transtion_table_afd[state].keys().__len__() != self.afd.alphabet.__len__():
+            return False
+        if not self.transtion_table_afd[state]:
+            return False
         initial_verification = self.transtion_table_afd[state][self.afnd.alphabet[0]]
 
         for i in range(1, len(self.afnd.alphabet)):
@@ -88,10 +90,15 @@ class conversor:
 
         copy_of_transtion_table_afd = self.transtion_table_afd.copy()
         for tuple_states in copy_of_transtion_table_afd.keys():
-            reacheble = self.is_reacheble(reachebles, tuple_states)
-            loop = self.is_loop(tuple_states)
+            reacheble = self.is_reacheble(tuple_states, reachebles)
+            if not reacheble:
+                del self.transtion_table_afd[tuple_states]
 
-            if not reacheble and loop:
+        copy_of_transtion_table_afd = self.transtion_table_afd.copy()
+        for tuple_states in copy_of_transtion_table_afd.keys():
+            if tuple_states:
+                loop = self.is_loop(tuple_states)
+            if loop:
                 del self.transtion_table_afd[tuple_states]
 
     def _to_deterministic(self, automata):
@@ -113,7 +120,7 @@ class conversor:
                 for symbol in self.afnd.alphabet:
                     # print(self.transtion_table_afd)
                     if symbol not in self.transtion_table_afnd[state].keys():
-                        break
+                        continue
                     else:
                         possible_state = self.transtion_table_afnd[state][symbol].copy()
                     if symbol not in self.transtion_table_afd[tuple_states].keys():
@@ -130,7 +137,7 @@ class conversor:
         self.delete_nodes()
 
         # Creating the states
-        return self.create_deterministic_automata()
+        self.create_deterministic_automata()
 
 
 if __name__ == '__main__':

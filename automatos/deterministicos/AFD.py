@@ -57,8 +57,20 @@ class deterministic_automato:
 
     def add_transition(self, original_state, destine_state, symbol):
         self.graph.add_edge(original_state, destine_state)
+        used_symbols = []
+        for state in self.graph[original_state].keys():
+            if 'transition symbol' in self.graph[original_state][state].keys():
+                used_symbols.append(self.graph[original_state][state]['transition symbol'])
+
+        if used_symbols == self.alphabet:
+            print("all transtitions used")
+            raise Exception
+
         if symbol in self.alphabet:
-            self.graph.edges[original_state, destine_state].update({'transition symbol': [symbol]})
+            if 'transition symbol' in list(self.graph.edges[original_state, destine_state].keys()):
+                self.graph.edges[original_state, destine_state]['transition symbol'].append(symbol)
+            else:
+                self.graph.edges[original_state, destine_state].update({'transition symbol': [symbol]})
         else:
             print('this symbol is not in alphabet, add')
 
